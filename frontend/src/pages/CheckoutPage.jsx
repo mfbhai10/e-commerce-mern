@@ -5,6 +5,7 @@ import orderService from "../services/orderService";
 import productService from "../services/productService";
 import SectionHeader from "../components/common/SectionHeader";
 import { clearCart, readCart } from "../utils/cartStorage";
+import { hasToken } from "../utils/authStorage";
 import { formatCurrency } from "../utils/format";
 
 const CheckoutPage = () => {
@@ -31,9 +32,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     const loadUser = async () => {
-      const token = window.localStorage.getItem("token");
-
-      if (!token) {
+      if (!hasToken()) {
         setAuthRequired(true);
         setAuthLoading(false);
         return;

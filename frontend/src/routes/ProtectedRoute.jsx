@@ -3,52 +3,41 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import authService from "../services/authService";
 import { hasToken } from "../utils/authStorage";
 
-const AdminRoute = () => {
+const ProtectedRoute = () => {
   const location = useLocation();
   const [status, setStatus] = useState("checking");
-  const [redirectTo, setRedirectTo] = useState("/login");
 
   useEffect(() => {
-    const verifyAdmin = async () => {
+    const verifySession = async () => {
       if (!hasToken()) {
-        setRedirectTo("/login");
         setStatus("denied");
         return;
       }
 
       try {
-        const response = await authService.getMe();
-        const user = response.data.data.user;
-
-        if (user.role !== "admin") {
-          setRedirectTo("/");
-          setStatus("denied");
-          return;
-        }
-
+        await authService.getMe();
         setStatus("allowed");
       } catch (_error) {
-        setRedirectTo("/login");
         setStatus("denied");
       }
     };
 
-    verifyAdmin();
+    verifySession();
   }, [location.pathname]);
 
   if (status === "checking") {
     return (
       <section className="page">
-        <div className="status-card">Verifying admin access...</div>
+        <div className="status-card">Checking session...</div>
       </section>
     );
   }
 
   if (status === "denied") {
-    return <Navigate to={redirectTo} replace />;
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
   return <Outlet />;
 };
 
-export default AdminRoute;
+export default ProtectedRoute;

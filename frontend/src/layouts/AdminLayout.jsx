@@ -1,12 +1,13 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
-import AdminSidebar from '../components/admin/AdminSidebar';
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import AdminSidebar from "../components/admin/AdminSidebar";
+import { clearToken } from "../utils/authStorage";
 
 const AdminLayout = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    window.localStorage.removeItem('token');
-    navigate('/login', { replace: true });
+    clearToken();
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -14,7 +15,11 @@ const AdminLayout = () => {
       <aside className="admin-sidebar-shell">
         <div className="admin-sidebar-shell__brand">
           <Link to="/admin">Storefront Admin</Link>
-          <button type="button" className="button-link button-link--secondary admin-logout" onClick={handleLogout}>
+          <button
+            type="button"
+            className="button-link button-link--secondary admin-logout"
+            onClick={handleLogout}
+          >
             Logout
           </button>
         </div>

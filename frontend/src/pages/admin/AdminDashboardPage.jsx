@@ -1,28 +1,29 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import productService from '../../services/productService';
-import orderService from '../../services/orderService';
-import categoryService from '../../services/categoryService';
-import SectionHeader from '../../components/common/SectionHeader';
-import { formatCurrency, formatDate } from '../../utils/format';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import productService from "../../services/productService";
+import orderService from "../../services/orderService";
+import categoryService from "../../services/categoryService";
+import SectionHeader from "../../components/common/SectionHeader";
+import { formatCurrency, formatDate } from "../../utils/format";
 
 const AdminDashboardPage = () => {
   const [stats, setStats] = useState({ products: 0, orders: 0, categories: 0 });
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadDashboard = async () => {
       try {
         setLoading(true);
-        setError('');
+        setError("");
 
-        const [productsResponse, ordersResponse, categoriesResponse] = await Promise.all([
-          productService.getProducts({ limit: 1 }),
-          orderService.getAllOrders({ limit: 5 }),
-          categoryService.getCategories({ limit: 1 }),
-        ]);
+        const [productsResponse, ordersResponse, categoriesResponse] =
+          await Promise.all([
+            productService.getProducts({ limit: 1 }),
+            orderService.getAllOrders({ limit: 5 }),
+            categoryService.getCategories({ limit: 1 }),
+          ]);
 
         setStats({
           products: productsResponse.data.data.pagination?.total || 0,
@@ -31,7 +32,10 @@ const AdminDashboardPage = () => {
         });
         setRecentOrders(ordersResponse.data.data.orders || []);
       } catch (requestError) {
-        setError(requestError?.response?.data?.message || 'Unable to load admin dashboard.');
+        setError(
+          requestError?.response?.data?.message ||
+            "Unable to load admin dashboard.",
+        );
       } finally {
         setLoading(false);
       }
@@ -47,17 +51,24 @@ const AdminDashboardPage = () => {
           eyebrow="Admin overview"
           title="Dashboard"
           description="Monitor store activity and jump into product, order, or category management."
-          action={(
+          action={
             <div className="admin-header-actions">
-              <Link to="/products" className="button-link button-link--secondary">
+              <Link
+                to="/products"
+                className="button-link button-link--secondary"
+              >
                 View storefront
               </Link>
             </div>
-          )}
+          }
         />
 
-        {error ? <div className="status-card status-card--error">{error}</div> : null}
-        {loading ? <div className="status-card">Loading dashboard data...</div> : null}
+        {error ? (
+          <div className="status-card status-card--error">{error}</div>
+        ) : null}
+        {loading ? (
+          <div className="status-card">Loading dashboard data...</div>
+        ) : null}
 
         {!loading ? (
           <div className="admin-stats-grid">
@@ -104,10 +115,12 @@ const AdminDashboardPage = () => {
                 {recentOrders.map((order) => (
                   <tr key={order._id}>
                     <td>{order.orderNumber}</td>
-                    <td>{order.user?.name || order.user?.email || 'N/A'}</td>
+                    <td>{order.user?.name || order.user?.email || "N/A"}</td>
                     <td>{order.status}</td>
-                    <td>{order.payment?.status || 'pending'}</td>
-                    <td>{formatCurrency(order.pricing?.total, order.currency)}</td>
+                    <td>{order.payment?.status || "pending"}</td>
+                    <td>
+                      {formatCurrency(order.pricing?.total, order.currency)}
+                    </td>
                     <td>{formatDate(order.createdAt)}</td>
                   </tr>
                 ))}

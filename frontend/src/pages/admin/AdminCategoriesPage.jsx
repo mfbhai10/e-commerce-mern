@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-import categoryService from '../../services/categoryService';
-import SectionHeader from '../../components/common/SectionHeader';
+import { useEffect, useMemo, useState } from "react";
+import categoryService from "../../services/categoryService";
+import SectionHeader from "../../components/common/SectionHeader";
 
 const emptyForm = {
-  name: '',
-  description: '',
-  parent: '',
+  name: "",
+  description: "",
+  parent: "",
   sortOrder: 0,
   isActive: true,
 };
@@ -14,21 +14,26 @@ const AdminCategoriesPage = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
-  const [editingId, setEditingId] = useState('');
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [editingId, setEditingId] = useState("");
   const [form, setForm] = useState(emptyForm);
 
-  const parentOptions = useMemo(() => categories.filter((category) => category._id !== editingId), [categories, editingId]);
+  const parentOptions = useMemo(
+    () => categories.filter((category) => category._id !== editingId),
+    [categories, editingId],
+  );
 
   const loadCategories = async () => {
     try {
       setLoading(true);
-      setError('');
+      setError("");
       const response = await categoryService.getCategories({ limit: 100 });
       setCategories(response.data.data.categories || []);
     } catch (requestError) {
-      setError(requestError?.response?.data?.message || 'Unable to load categories.');
+      setError(
+        requestError?.response?.data?.message || "Unable to load categories.",
+      );
     } finally {
       setLoading(false);
     }
@@ -40,25 +45,26 @@ const AdminCategoriesPage = () => {
 
   const resetForm = () => {
     setForm(emptyForm);
-    setEditingId('');
-    setMessage('');
+    setEditingId("");
+    setMessage("");
   };
 
   const handleChange = (field) => (event) => {
-    const value = field === 'isActive' ? event.target.value === 'true' : event.target.value;
+    const value =
+      field === "isActive" ? event.target.value === "true" : event.target.value;
     setForm((current) => ({ ...current, [field]: value }));
   };
 
   const handleEdit = (category) => {
     setEditingId(category._id);
     setForm({
-      name: category.name || '',
-      description: category.description || '',
-      parent: category.parent?._id || '',
+      name: category.name || "",
+      description: category.description || "",
+      parent: category.parent?._id || "",
       sortOrder: category.sortOrder ?? 0,
       isActive: Boolean(category.isActive),
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSubmit = async (event) => {
@@ -66,8 +72,8 @@ const AdminCategoriesPage = () => {
 
     try {
       setSaving(true);
-      setError('');
-      setMessage('');
+      setError("");
+      setMessage("");
 
       const payload = {
         ...form,
@@ -76,23 +82,25 @@ const AdminCategoriesPage = () => {
 
       if (editingId) {
         await categoryService.updateCategory(editingId, payload);
-        setMessage('Category updated successfully.');
+        setMessage("Category updated successfully.");
       } else {
         await categoryService.createCategory(payload);
-        setMessage('Category created successfully.');
+        setMessage("Category created successfully.");
       }
 
       resetForm();
       await loadCategories();
     } catch (requestError) {
-      setError(requestError?.response?.data?.message || 'Unable to save category.');
+      setError(
+        requestError?.response?.data?.message || "Unable to save category.",
+      );
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this category?')) {
+    if (!window.confirm("Delete this category?")) {
       return;
     }
 
@@ -101,7 +109,9 @@ const AdminCategoriesPage = () => {
       await loadCategories();
       if (editingId === id) resetForm();
     } catch (requestError) {
-      setError(requestError?.response?.data?.message || 'Unable to delete category.');
+      setError(
+        requestError?.response?.data?.message || "Unable to delete category.",
+      );
     }
   };
 
@@ -114,36 +124,59 @@ const AdminCategoriesPage = () => {
           description="Maintain your category tree through live API requests and responsive management controls."
         />
 
-        {message ? <div className="status-card status-card--success">{message}</div> : null}
-        {error ? <div className="status-card status-card--error">{error}</div> : null}
-        {loading ? <div className="status-card">Loading categories...</div> : null}
+        {message ? (
+          <div className="status-card status-card--success">{message}</div>
+        ) : null}
+        {error ? (
+          <div className="status-card status-card--error">{error}</div>
+        ) : null}
+        {loading ? (
+          <div className="status-card">Loading categories...</div>
+        ) : null}
 
         <form className="admin-form" onSubmit={handleSubmit}>
           <div className="form-grid">
             <label className="form-field form-field--full">
               <span>Name</span>
-              <input value={form.name} onChange={handleChange('name')} required />
+              <input
+                value={form.name}
+                onChange={handleChange("name")}
+                required
+              />
             </label>
             <label className="form-field form-field--full">
               <span>Description</span>
-              <textarea value={form.description} onChange={handleChange('description')} rows="4" />
+              <textarea
+                value={form.description}
+                onChange={handleChange("description")}
+                rows="4"
+              />
             </label>
             <label className="form-field">
               <span>Parent category</span>
-              <select value={form.parent} onChange={handleChange('parent')}>
+              <select value={form.parent} onChange={handleChange("parent")}>
                 <option value="">No parent</option>
                 {parentOptions.map((category) => (
-                  <option key={category._id} value={category._id}>{category.name}</option>
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
                 ))}
               </select>
             </label>
             <label className="form-field">
               <span>Sort order</span>
-              <input type="number" value={form.sortOrder} onChange={handleChange('sortOrder')} />
+              <input
+                type="number"
+                value={form.sortOrder}
+                onChange={handleChange("sortOrder")}
+              />
             </label>
             <label className="form-field">
               <span>Active</span>
-              <select value={form.isActive ? 'true' : 'false'} onChange={handleChange('isActive')}>
+              <select
+                value={form.isActive ? "true" : "false"}
+                onChange={handleChange("isActive")}
+              >
                 <option value="true">Yes</option>
                 <option value="false">No</option>
               </select>
@@ -152,10 +185,18 @@ const AdminCategoriesPage = () => {
 
           <div className="form-actions">
             <button type="submit" className="button-link" disabled={saving}>
-              {saving ? 'Saving...' : editingId ? 'Update category' : 'Create category'}
+              {saving
+                ? "Saving..."
+                : editingId
+                  ? "Update category"
+                  : "Create category"}
             </button>
             {editingId ? (
-              <button type="button" className="button-link button-link--secondary" onClick={resetForm}>
+              <button
+                type="button"
+                className="button-link button-link--secondary"
+                onClick={resetForm}
+              >
                 Cancel edit
               </button>
             ) : null}
@@ -187,13 +228,23 @@ const AdminCategoriesPage = () => {
                 <tr key={category._id}>
                   <td>{category.name}</td>
                   <td>{category.slug}</td>
-                  <td>{category.parent?.name || 'Root'}</td>
-                  <td>{category.isActive ? 'Yes' : 'No'}</td>
+                  <td>{category.parent?.name || "Root"}</td>
+                  <td>{category.isActive ? "Yes" : "No"}</td>
                   <td>{category.sortOrder}</td>
                   <td>
                     <div className="admin-row-actions">
-                      <button type="button" onClick={() => handleEdit(category)}>Edit</button>
-                      <button type="button" onClick={() => handleDelete(category._id)}>Delete</button>
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(category)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(category._id)}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>

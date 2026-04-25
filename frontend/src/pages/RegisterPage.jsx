@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../services/authService";
 import AuthShell from "../components/auth/AuthShell";
+import { hasToken, setToken } from "../utils/authStorage";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -11,9 +12,7 @@ const RegisterPage = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = window.localStorage.getItem("token");
-
-    if (!token) {
+    if (!hasToken()) {
       setCheckingSession(false);
       return;
     }
@@ -43,7 +42,7 @@ const RegisterPage = () => {
       setError("");
 
       const response = await authService.register(form);
-      window.localStorage.setItem("token", response.data.data.token);
+      setToken(response.data.data.token);
       navigate(response.data.data.user.role === "admin" ? "/admin" : "/", {
         replace: true,
       });

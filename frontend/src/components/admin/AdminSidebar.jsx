@@ -1,6 +1,7 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 
-const navClass = ({ isActive }) => `admin-nav-link${isActive ? ' admin-nav-link--active' : ''}`;
+const navClass = ({ isActive }) =>
+  `admin-nav-link${isActive ? " admin-nav-link--active" : ""}`;
 
 const AdminSidebar = () => {
   return (

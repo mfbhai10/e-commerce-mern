@@ -1,4 +1,5 @@
 import axios from "axios";
+import { clearToken, getToken } from "../../utils/authStorage";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1",
@@ -9,7 +10,7 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-  const token = window.localStorage.getItem("token");
+  const token = getToken();
   config.headers = config.headers || {};
 
   if (token) {
@@ -28,7 +29,13 @@ apiClient.interceptors.request.use((config) => {
 
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => Promise.reject(error),
+  (error) => {
+    if (error?.response?.status === 401) {
+      clearToken();
+    }
+
+    return Promise.reject(error);
+  },
 );
 
 export default apiClient;
