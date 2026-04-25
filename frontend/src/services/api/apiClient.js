@@ -10,9 +10,17 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config) => {
   const token = window.localStorage.getItem("token");
+  config.headers = config.headers || {};
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+    delete config.headers["content-type"];
+  } else {
+    config.headers["Content-Type"] = "application/json";
   }
 
   return config;

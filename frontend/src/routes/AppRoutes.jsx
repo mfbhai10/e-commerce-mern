@@ -8,6 +8,12 @@ import CheckoutPage from "../pages/CheckoutPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import NotFoundPage from "../pages/NotFoundPage";
+import AdminRoute from "./AdminRoute";
+import AdminLayout from "../layouts/AdminLayout";
+import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
+import AdminProductsPage from "../pages/admin/AdminProductsPage";
+import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
+import AdminCategoriesPage from "../pages/admin/AdminCategoriesPage";
 
 const AppRoutes = () => {
   return (
@@ -22,6 +28,16 @@ const AppRoutes = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
       </Route>
+
+      <Route element={<AdminRoute />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="products" element={<AdminProductsPage />} />
+          <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="categories" element={<AdminCategoriesPage />} />
+        </Route>
+      </Route>
+
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

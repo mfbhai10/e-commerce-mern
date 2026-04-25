@@ -20,8 +20,9 @@ const RegisterPage = () => {
 
     const checkSession = async () => {
       try {
-        await authService.getMe();
-        navigate("/", { replace: true });
+        const response = await authService.getMe();
+        const role = response.data.data.user.role;
+        navigate(role === "admin" ? "/admin" : "/", { replace: true });
       } catch (_error) {
         setCheckingSession(false);
       }
@@ -43,7 +44,9 @@ const RegisterPage = () => {
 
       const response = await authService.register(form);
       window.localStorage.setItem("token", response.data.data.token);
-      navigate("/", { replace: true });
+      navigate(response.data.data.user.role === "admin" ? "/admin" : "/", {
+        replace: true,
+      });
     } catch (requestError) {
       setError(
         requestError?.response?.data?.message || "Unable to create account.",
