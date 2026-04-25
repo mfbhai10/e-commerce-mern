@@ -251,6 +251,29 @@ button {
   background: rgba(236, 253, 245, 0.95);
 }
 
+.payment-result-page {
+  display: grid;
+  gap: 1rem;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.payment-result-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.payment-result-page .status-card strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 1.1rem;
+}
+
+.payment-result-page .status-card p {
+  margin: 0;
+}
+
 .empty-state {
   display: grid;
   place-items: center;

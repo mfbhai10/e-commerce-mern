@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import authService from "../services/authService";
 import orderService from "../services/orderService";
+import paymentService from "../services/paymentService";
 import productService from "../services/productService";
 import SectionHeader from "../components/common/SectionHeader";
 import { clearCart, readCart } from "../utils/cartStorage";
@@ -9,6 +10,8 @@ import { hasToken } from "../utils/authStorage";
 import { formatCurrency } from "../utils/format";
 
 const CheckoutPage = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authRequired, setAuthRequired] = useState(false);
@@ -54,6 +57,13 @@ const CheckoutPage = () => {
 
     loadUser();
   }, []);
+
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    if (["success", "fail", "cancel"].includes(payment)) {
+      navigate(`/payment/${payment}?source=gateway`, { replace: true });
+    }
+  }, [navigate, searchParams]);
 
   const syncCart = async () => {
     const storedCart = readCart();
@@ -150,16 +160,36 @@ const CheckoutPage = () => {
         notes: { customerNote: form.customerNote },
       };
 
-      await orderService.createOrder(payload);
+      const orderResponse = await orderService.createOrder(payload);
+      const createdOrder = orderResponse.data.data.order;
+
+      if (form.paymentMethod === "sslcommerz") {
+        setSuccessMessage("Redirecting to SSLCommerz...");
+
+        const paymentResponse = await paymentService.createSslCommerzSession(
+          createdOrder._id,
+        );
+        const paymentUrl = paymentResponse.data.data.paymentUrl;
+
+        if (!paymentUrl) {
+          throw new Error("Payment gateway URL is missing");
+        }
+
+        window.location.assign(paymentUrl);
+        return;
+      }
+
       clearCart();
       setCartItems([]);
       setSuccessMessage("Order created successfully.");
       window.setTimeout(() => {
-        window.location.href = "/products";
-      }, 1200);
+        navigate("/payment/success?source=cod", { replace: true });
+      }, 500);
     } catch (requestError) {
       setError(
-        requestError?.response?.data?.message || "Unable to submit checkout.",
+        requestError?.response?.data?.message ||
+          requestError?.message ||
+          "Unable to submit checkout.",
       );
     } finally {
       setSubmitting(false);
@@ -300,6 +330,7 @@ const CheckoutPage = () => {
                   <option value="paypal">PayPal</option>
                   <option value="bank_transfer">Bank transfer</option>
                   <option value="manual">Manual</option>
+                  <option value="sslcommerz">SSLCommerz</option>
                 </select>
               </label>
               <label className="form-field form-field--full">
