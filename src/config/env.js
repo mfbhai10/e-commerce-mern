@@ -19,6 +19,10 @@ const env = {
   jwtIssuer: process.env.JWT_ISSUER || "ecommerce-api",
   jwtAudience: process.env.JWT_AUDIENCE || "ecommerce-client",
   bcryptSaltRounds: Number(process.env.BCRYPT_SALT_ROUNDS) || 12,
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || "",
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || "",
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || "",
+  cloudinaryFolder: process.env.CLOUDINARY_FOLDER || "ecommerce/products",
   corsOrigin: process.env.CORS_ORIGIN || "*",
 };
 
