@@ -16,6 +16,9 @@ const env = {
   mongoUri: process.env.MONGO_URI,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
+  jwtIssuer: process.env.JWT_ISSUER || "ecommerce-api",
+  jwtAudience: process.env.JWT_AUDIENCE || "ecommerce-client",
+  bcryptSaltRounds: Number(process.env.BCRYPT_SALT_ROUNDS) || 12,
   corsOrigin: process.env.CORS_ORIGIN || "*",
 };
 

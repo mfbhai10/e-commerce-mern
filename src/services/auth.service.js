@@ -26,10 +26,17 @@ const login = async ({ email, password }) => {
     throw new ApiError(401, "Invalid email or password");
   }
 
+  if (!user.isActive) {
+    throw new ApiError(403, "Account is inactive");
+  }
+
   const isPasswordValid = await user.comparePassword(password);
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid email or password");
   }
+
+  user.lastLoginAt = new Date();
+  await user.save();
 
   return sanitizeUser(user);
 };

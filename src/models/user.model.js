@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const { env } = require("../config/env");
 
 const addressSchema = new mongoose.Schema(
   {
@@ -87,7 +88,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      minlength: 8,
       select: false,
     },
     role: {
@@ -162,7 +163,7 @@ userSchema.pre("save", async function preSave(next) {
     return next();
   }
 
-  const salt = await bcrypt.genSalt(12);
+  const salt = await bcrypt.genSalt(env.bcryptSaltRounds);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });

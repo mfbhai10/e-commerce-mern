@@ -6,8 +6,10 @@ const asyncHandler = require("../utils/asyncHandler");
 
 const extractToken = (req) => {
   const authHeader = req.headers.authorization || "";
-  if (authHeader.startsWith("Bearer ")) {
-    return authHeader.split(" ")[1];
+  const [scheme, token] = authHeader.split(" ");
+
+  if (scheme?.toLowerCase() === "bearer" && token) {
+    return token;
   }
 
   return null;
@@ -22,14 +24,23 @@ const protect = asyncHandler(async (req, _res, next) => {
 
   let decoded;
   try {
-    decoded = jwt.verify(token, env.jwtSecret);
+    decoded = jwt.verify(token, env.jwtSecret, {
+      algorithms: ["HS256"],
+      issuer: env.jwtIssuer,
+      audience: env.jwtAudience,
+    });
   } catch (_error) {
     throw new ApiError(401, "Not authorized, token is invalid or expired");
   }
 
-  const user = await User.findById(decoded.id);
+  const userId = decoded.sub || decoded.id;
+  const user = await User.findById(userId);
   if (!user) {
     throw new ApiError(401, "Not authorized, user no longer exists");
+  }
+
+  if (!user.isActive) {
+    throw new ApiError(403, "Account is inactive");
   }
 
   req.user = {
