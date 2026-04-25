@@ -23,6 +23,14 @@ const env = {
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || "",
   cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || "",
   cloudinaryFolder: process.env.CLOUDINARY_FOLDER || "ecommerce/products",
+  frontendBaseUrl: process.env.FRONTEND_BASE_URL || "http://localhost:3000",
+  backendBaseUrl: process.env.BACKEND_BASE_URL || "http://localhost:5000",
+  sslcommerzStoreId: process.env.SSLCOMMERZ_STORE_ID || "",
+  sslcommerzStorePassword: process.env.SSLCOMMERZ_STORE_PASSWORD || "",
+  sslcommerzIsLive:
+    String(process.env.SSLCOMMERZ_IS_LIVE || "false") === "true",
+  sslcommerzInitUrl: process.env.SSLCOMMERZ_INIT_URL || "",
+  sslcommerzValidationUrl: process.env.SSLCOMMERZ_VALIDATION_URL || "",
   corsOrigin: process.env.CORS_ORIGIN || "*",
 };
 

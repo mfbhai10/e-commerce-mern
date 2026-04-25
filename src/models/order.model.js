@@ -223,13 +223,40 @@ const orderSchema = new mongoose.Schema(
     payment: {
       method: {
         type: String,
-        enum: ["stripe", "paypal", "cod", "bank_transfer", "manual"],
+        enum: [
+          "stripe",
+          "paypal",
+          "cod",
+          "bank_transfer",
+          "manual",
+          "sslcommerz",
+        ],
         default: "cod",
       },
       status: {
         type: String,
         enum: ["pending", "paid", "failed", "refunded", "partially_refunded"],
         default: "pending",
+      },
+      gateway: {
+        type: String,
+        trim: true,
+        uppercase: true,
+        maxlength: 40,
+      },
+      gatewaySessionKey: {
+        type: String,
+        trim: true,
+        maxlength: 255,
+      },
+      gatewayValidationId: {
+        type: String,
+        trim: true,
+        maxlength: 255,
+      },
+      inventoryRestored: {
+        type: Boolean,
+        default: false,
       },
       transactionId: {
         type: String,

@@ -13,6 +13,15 @@ const VALID_ORDER_STATUSES = [
   "returned",
 ];
 
+const VALID_PAYMENT_METHODS = [
+  "stripe",
+  "paypal",
+  "cod",
+  "bank_transfer",
+  "manual",
+  "sslcommerz",
+];
+
 const assertValidObjectId = (value, fieldName) => {
   if (!mongoose.Types.ObjectId.isValid(value)) {
     throw new ApiError(400, `Invalid ${fieldName}`);
@@ -125,6 +134,20 @@ const createOrder = async ({
       }
     }
 
+    const paymentMethod = payment?.method || "cod";
+    if (!VALID_PAYMENT_METHODS.includes(paymentMethod)) {
+      throw new ApiError(400, "Invalid payment method");
+    }
+
+    const orderPaymentData = {
+      ...(payment || {}),
+      method: paymentMethod,
+    };
+
+    // COD orders are confirmed immediately but remain unpaid until delivery.
+    const initialOrderStatus =
+      paymentMethod === "cod" ? "confirmed" : "pending";
+
     const [order] = await Order.create(
       [
         {
@@ -133,7 +156,8 @@ const createOrder = async ({
           shippingAddress,
           billingAddress: billingAddress || shippingAddress,
           pricing: pricing || {},
-          payment: payment || {},
+          payment: orderPaymentData,
+          status: initialOrderStatus,
           coupon: coupon || undefined,
           notes: notes || {},
         },
